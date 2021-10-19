@@ -1,4 +1,5 @@
-﻿using Aether.Devices.Drivers;
+﻿using Aether.Bluetooth;
+using Aether.Devices.Drivers;
 using Aether.Devices.Sensors;
 using Aether.Devices.Sensors.Metadata;
 using Aether.Devices.Simulated;
@@ -114,6 +115,18 @@ simulateSensorCommand.Handler = CommandHandler.Create((string name) => RunAndPri
     return sensorInfo.CreateSimulatedSensor(Observable.Empty<Measurement>());
 }));
 
+var testBluetoothCommand = new Command("test-bt", "Tests Bluetooth Operations");
+testBluetoothCommand.Handler = CommandHandler.Create(async () =>
+{
+    BluetoothManager mgr = new BluetoothManager();
+    await mgr.Initialize();
+    Console.WriteLine($"ALIAS:{await mgr.GetAlias()}");
+    while (true)
+    {
+        Thread.Sleep(500);
+    }
+});
+
 var testVocCommand = new Command("test-voc", "Tests the VOC sensor while also providing data from SCD4x sensor");
 testVocCommand.Handler = CommandHandler.Create(async () =>
 {
@@ -190,7 +203,8 @@ var rootCommand = new RootCommand()
     },
     themeTestCommand,
     displayTestCommand,
-    testVocCommand
+    testVocCommand,
+    testBluetoothCommand
 };
 
 await rootCommand.InvokeAsync(Environment.CommandLine);
